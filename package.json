@@ -1,0 +1,26 @@
+{
+  "name": "@dboxjs/treemap",
+  "version": "0.0.1",
+  "description": "A treemap layer for dbox",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dboxjs/treemap.git"
+  },
+  "keywords": [
+    "d3",
+    "data",
+    "charts",
+    "dbox",
+    "treemap"
+  ],
+  "author": "Jorge Andrade <jorandradefig@gmail.com> (jorandradefig.github.io)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dboxjs/treemap/issues"
+  },
+  "homepage": "https://github.com/dboxjs/treemap#readme"
+}
