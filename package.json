@@ -2,7 +2,7 @@
   "name": "@dboxjs/treemap",
   "version": "0.0.1",
   "description": "A treemap layer for dbox",
-  "main": "index.js",
+  "main": "treemap.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,7 +17,7 @@
     "dbox",
     "treemap"
   ],
-  "author": "Jorge Andrade <jorandradefig@gmail.com> (jorandradefig.github.io)",
+  "author": "@dboxjs",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/dboxjs/treemap/issues"
