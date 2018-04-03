@@ -7,14 +7,15 @@ export default function(config) {
     var vm = this;
     vm._config = config ? config : {};
     vm._config._padding = 3;
-    vm._config._colorScale = d3.scaleOrdinal(d3.schemeCategory20c);
     vm._config._format = d3.format(",.1f");
     vm._config._labels = true;
     vm._config.tip = function(d) {
       return d.data.name + "\n" + vm._config._format(d.value);
     };
     vm._data = [];
-    vm._scales = {};
+    vm._scales = {
+      color: d3.scaleOrdinal(d3.schemeCategory20c)
+    };
     vm._axes = {};
     vm._tip = d3.tip()
       .attr('class', 'd3-tip tip-treemap')
@@ -35,9 +36,9 @@ export default function(config) {
     return vm;
   }
 
-  Treemap.prototype.colorScale = function(arrayOfColors) {
+  Treemap.prototype.colors = function(arrayOfColors) {
     var vm = this;
-    vm._config._colorScale = d3.scaleOrdinal(arrayOfColors);
+    vm._scales.color = d3.scaleOrdinal(arrayOfColors);
     return vm;
   }
 
@@ -247,7 +248,7 @@ export default function(config) {
         return d.y1 - d.y0;
       })
       .attr("fill", function(d) {
-        return vm._config._colorScale(d.data.id);
+        return vm._scales.color(d.data.id);
       });
 
     cell.append("clipPath")
