@@ -13,7 +13,7 @@ export default function(config, helper) {
     vm._config._format = d3.format(",.1f");
     vm._config._labels = false;
     vm._config.tip = function(d) {
-      var html = '<div class="d3-tip">';
+      var html = '<div>';
       html += '<span>' + d.data.name + "</span><br><span>" + vm._config._format(d.value) + '</span>';
       html += '</div>';
       return html;
