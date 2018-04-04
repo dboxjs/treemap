@@ -2,8 +2,11 @@
  * Simple SVG Treemap Chart
  */
 
-export default function(config) {
-  function Treemap(config) {
+export default function(config, helper) {
+
+  var Treemap = Object.create(helper);
+
+  Treemap.init = function(config) {
     var vm = this;
     vm._config = config ? config : {};
     vm._config._padding = 3;
@@ -23,32 +26,25 @@ export default function(config) {
       .html(vm._config.tip);
   }
 
-  //-------------------------------
-  //User config functions
-  Treemap.prototype.end = function() {
-    var vm = this;
-    return vm._chart;
-  }
-
-  Treemap.prototype.size = function(col) {
+  Treemap.size = function(col) {
     var vm = this;
     vm._config._size = col;
     return vm;
   }
 
-  Treemap.prototype.colors = function(arrayOfColors) {
+  Treemap.colors = function(arrayOfColors) {
     var vm = this;
     vm._scales.color = d3.scaleOrdinal(arrayOfColors);
     return vm;
   }
 
-  Treemap.prototype.padding = function(padding) {
+  Treemap.padding = function(padding) {
     var vm = this;
     vm._config._padding = padding;
     return vm;
   }
 
-  Treemap.prototype.nestBy = function(keys) {
+  Treemap.nestBy = function(keys) {
     var vm = this;
     if (Array.isArray(keys)) {
       if (keys.length == 0)
@@ -66,7 +62,7 @@ export default function(config) {
     return vm;
   }
 
-  Treemap.prototype.format = function(format) {
+  Treemap.format = function(format) {
     var vm = this;
     if (typeof format == 'function' || format instanceof Function)
       vm._config._format = format;
@@ -75,43 +71,35 @@ export default function(config) {
     return vm;
   }
 
-  Treemap.prototype.labels = function(bool) {
+  Treemap.labels = function(bool) {
     var vm = this;
     vm._config._labels = Boolean(bool);
     return vm;
   };
 
-  Treemap.prototype.tip = function(tip) {
+  Treemap.tip = function(tip) {
     var vm = this;
     vm._config.tip = tip;
     vm._tip.html(vm._config.tip);
     return vm;
   }
 
-  //-------------------------------
-  //Triggered by the chart.js;
-  Treemap.prototype.chart = function(chart) {
-    var vm = this;
-    vm._chart = chart;
-    return vm;
-  }
-
-  Treemap.prototype.scales = function() {
+  Treemap.scales = function (scales) {
     var vm = this;
     return vm;
   }
 
-  Treemap.prototype.axes = function() {
+  Treemap.axes = function() {
     var vm = this;
     return vm;
   }
 
-  Treemap.prototype.domains = function() {
+  Treemap.domains = function() {
     var vm = this;
     return vm;
   }
 
-  Treemap.prototype.isValidStructure = function(datum) {
+  Treemap.isValidStructure = function(datum) {
     var vm = this;
     if ((typeof datum.name === 'string' || datum.name instanceof String) && Array.isArray(datum.children)) {
       var res = true;
@@ -126,7 +114,7 @@ export default function(config) {
     }
   }
 
-  Treemap.prototype.formatNestedData = function(data) {
+  Treemap.formatNestedData = function(data) {
     var vm = this;
     if (data.key) {
       data.name = data.key;
@@ -156,7 +144,7 @@ export default function(config) {
     }))
   }
 
-  Treemap.prototype.data = function(data) {
+  Treemap.data = function(data) {
     var vm = this;
     // Validate structure like [{name: '', children: [{},{}]}]
     if (data) {
@@ -207,13 +195,13 @@ export default function(config) {
     return vm;
   }
 
-  Treemap.prototype.draw = function() {
+  Treemap.draw = function() {
     var vm = this;
-    vm._chart._svg.call(vm._tip);
+    vm.chart.svg().call(vm._tip);
 
     var treemap = d3.treemap()
       .tile(d3.treemapResquarify)
-      .size([vm._chart._width, vm._chart._height])
+      .size([vm.chart.width, vm.chart.height])
       .round(true)
       .paddingInner(vm._config._padding);
 
@@ -230,7 +218,9 @@ export default function(config) {
 
     treemap(root);
 
-    var cell = vm._chart._svg.selectAll("g")
+    console.log(root.leaves());
+
+    var cell = vm.chart.svg().selectAll("g")
       .data(root.leaves())
       .enter().append("g")
       .attr("transform", function(d) {
@@ -300,5 +290,7 @@ export default function(config) {
 
     return vm;
   }
-  return new Treemap(config);
+
+  Treemap.init(config);
+  return Treemap;
 }
