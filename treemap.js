@@ -11,9 +11,12 @@ export default function(config, helper) {
     vm._config = config ? config : {};
     vm._config._padding = 3;
     vm._config._format = d3.format(",.1f");
-    vm._config._labels = true;
+    vm._config._labels = false;
     vm._config.tip = function(d) {
-      return d.data.name + "\n" + vm._config._format(d.value);
+      var html = '<div class="d3-tip">';
+      html += '<span>' + d.data.name + "</span><br><span>" + vm._config._format(d.value) + '</span>';
+      html += '</div>';
+      return html;
     };
     vm._data = [];
     vm._scales = {
