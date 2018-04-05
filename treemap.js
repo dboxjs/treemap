@@ -10,7 +10,6 @@ export default function(config, helper) {
     var vm = this;
     vm._config = config ? config : {};
     vm._config._padding = 3;
-    vm._config._format = d3.format(",.1f");
     vm._config._labels = false;
     vm._config.tip = function(d) {
       console.log(d);
@@ -20,7 +19,7 @@ export default function(config, helper) {
         html += '<span>' + d.parent.data.name + '</span><br>'; 
       }
       html += '<span>' + d.data.name + '</span><br>'; 
-      html += '<span>' + vm._config._format(d.value) + '</span>';
+      html += '<span>' + vm.utils.format(d.value) + '</span>';
       html += '</div>';
       return html;
     };
@@ -74,9 +73,9 @@ export default function(config, helper) {
   Treemap.format = function(format) {
     var vm = this;
     if (typeof format == 'function' || format instanceof Function)
-      vm._config._format = format;
+      vm.utils.format = format;
     else
-      vm._config._format = d3.format(format);
+      vm.utils.format = d3.format(format);
     return vm;
   }
 
@@ -280,7 +279,7 @@ export default function(config, helper) {
         .attr("x", 8)
         .attr("y", 45)
         .text(function(d) {
-          return d.value > 2 ? vm._config._format(d.value) : '';
+          return d.value > 2 ? vm.utils.format(d.value) : '';
         });
     }
 
