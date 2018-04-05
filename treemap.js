@@ -40,9 +40,12 @@ export default function(config, helper) {
     return vm;
   }
 
-  Treemap.colors = function(arrayOfColors) {
+  Treemap.colors = function(arrayOfColors, domain) {
     var vm = this;
     vm._scales.color = d3.scaleOrdinal(arrayOfColors);
+    if (domain) {
+      vm._scales.color.domain(domain);
+    }
     return vm;
   }
 
@@ -246,7 +249,10 @@ export default function(config, helper) {
         return d.y1 - d.y0;
       })
       .attr("fill", function(d) {
-        return vm._scales.color(d.data.id);
+        console.log('fill', d);
+        console.log(vm._scales.color.range());
+        console.log(vm._scales.color.domain());
+        return vm._scales.color(d.data.name);
       });
 
     cell.append("clipPath")
