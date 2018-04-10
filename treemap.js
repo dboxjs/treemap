@@ -1,7 +1,8 @@
+import * as d3 from 'd3'
+
 /* 
  * Simple SVG Treemap Chart
  */
-
 export default function(config, helper) {
 
   var Treemap = Object.create(helper);
