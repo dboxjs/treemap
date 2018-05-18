@@ -29,7 +29,7 @@ export default function(config, helper) {
       color: d3.scaleOrdinal(d3.schemeCategory20c)
     };
     vm._axes = {};
-    vm._tip = d3.tip()
+    vm._tip = vm.utils.d3.tip()
       .attr('class', 'd3-tip tip-treemap')
       .direction('n')
       .html(vm._config.tip);
