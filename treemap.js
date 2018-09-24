@@ -20,7 +20,7 @@ export default function(config, helper) {
         html += '<span>' + d.parent.data.name + '</span><br>'; 
       }
       html += '<span>' + d.data.name + '</span><br>'; 
-      html += '<span>' + vm.utils.format(d.value) + '</span>';
+      html += '<span>' + vm.utils.format(d.value, vm._config.decimals) + '</span>';
       html += '</div>';
       return html;
     };
@@ -79,7 +79,7 @@ export default function(config, helper) {
     if (typeof format == 'function' || format instanceof Function)
       vm.utils.format = format;
     else
-      vm.utils.format = d3.format(format);
+      vm.utils.format = d3.format(format, vm._config.decimals);
     return vm;
   }
 
@@ -286,7 +286,7 @@ export default function(config, helper) {
         .attr("x", 8)
         .attr("y", 45)
         .text(function(d) {
-          return d.value > 2 ? vm.utils.format(d.value) : '';
+          return d.value > 2 ? vm.utils.format(d.value, vm._config.decimals) : '';
         });
     }
 
