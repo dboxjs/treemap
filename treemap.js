@@ -20,7 +20,7 @@ export default function(config, helper) {
         html += '<span>' + d.parent.data.name + '</span><br>'; 
       }
       html += '<span>' + d.data.name + '</span><br>'; 
-      html += '<span>' + vm.utils.format(d.value, vm._config.decimals) + '</span>';
+      html += '<span>' + vm.utils.format(d.value, false, vm._config.decimals) + '</span>';
       html += '</div>';
       return html;
     };
@@ -286,7 +286,7 @@ export default function(config, helper) {
         .attr("x", 8)
         .attr("y", 45)
         .text(function(d) {
-          return d.value > 2 ? vm.utils.format(d.value, vm._config.decimals) : '';
+          return d.value > 2 ? vm.utils.format(d.value, true, vm._config.decimals) : '';
         });
     }
 
