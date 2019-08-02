@@ -13,14 +13,13 @@ export default function(config, helper) {
     vm._config._padding = 3;
     vm._config._labels = false;
     vm._config.tip = function(d) {
-      console.log(d);
       var html = '<div>';
       if (d.parent.data.name && d.parent.data.name !== 'data') {
 
         html += '<span>' + d.parent.data.name + '</span><br>'; 
       }
       html += '<span>' + d.data.name + '</span><br>'; 
-      html += '<span>' + vm.utils.format(d.value, false, vm._config.decimals) + '</span>';
+      html += '<span>' + vm.utils.format()(d.value) + '</span>';
       html += '</div>';
       return html;
     };
@@ -230,8 +229,6 @@ export default function(config, helper) {
 
     treemap(root);
 
-    console.log(root.leaves());
-
     var cell = vm.chart.svg().selectAll("g")
       .data(root.leaves())
       .enter().append("g")
@@ -250,9 +247,6 @@ export default function(config, helper) {
         return d.y1 - d.y0;
       })
       .attr("fill", function(d) {
-        console.log('fill', d);
-        console.log(vm._scales.color.range());
-        console.log(vm._scales.color.domain());
         return vm._scales.color(d.data.name);
       });
 
@@ -286,7 +280,7 @@ export default function(config, helper) {
         .attr("x", 8)
         .attr("y", 45)
         .text(function(d) {
-          return d.value > 2 ? vm.utils.format(d.value, true, vm._config.decimals) : '';
+          return d.value > 2 ? vm.utils.format(null, true)(d.value) : '';
         });
     }
 
