@@ -1,53 +1,61 @@
+import * as d3 from 'd3';
+
 /* 
  * Simple SVG Treemap Chart
  */
+export default function(config, helper) {
 
-export default function(config) {
-  function Treemap(config) {
+  var Treemap = Object.create(helper);
+
+  Treemap.init = function(config) {
     var vm = this;
     vm._config = config ? config : {};
     vm._config._padding = 3;
-    vm._config._colorScale = d3.scaleOrdinal(d3.schemeCategory20c);
-    vm._config._format = d3.format(",.1f");
-    vm._config._labels = true;
+    vm._config._labels = false;
     vm._config.tip = function(d) {
-      return d.data.name + "\n" + vm._config._format(d.value);
+      var html = '<div>';
+      if (d.parent.data.name && d.parent.data.name !== 'data') {
+
+        html += '<span>' + d.parent.data.name + '</span><br>'; 
+      }
+      html += '<span>' + d.data.name + '</span><br>'; 
+      html += '<span>' + vm.utils.format()(d.value) + '</span>';
+      html += '</div>';
+      return html;
     };
     vm._data = [];
-    vm._scales = {};
+    vm._scales = {
+      color: d3.scaleOrdinal(d3.schemeCategory20c)
+    };
     vm._axes = {};
-    vm._tip = d3.tip()
+    vm._tip = vm.utils.d3.tip()
       .attr('class', 'd3-tip tip-treemap')
       .direction('n')
       .html(vm._config.tip);
   }
 
-  //-------------------------------
-  //User config functions
-  Treemap.prototype.end = function() {
-    var vm = this;
-    return vm._chart;
-  }
-
-  Treemap.prototype.size = function(col) {
+  Treemap.size = function(col) {
     var vm = this;
     vm._config._size = col;
     return vm;
   }
 
-  Treemap.prototype.colorScale = function(arrayOfColors) {
+  Treemap.colors = function(arrayOfColors, domain) {
     var vm = this;
-    vm._config._colorScale = d3.scaleOrdinal(arrayOfColors);
+    vm._scales.color = d3.scaleOrdinal(arrayOfColors);
+    if (domain) {
+      vm._scales.color.domain(domain);
+    }
     return vm;
   }
 
-  Treemap.prototype.padding = function(padding) {
+  Treemap.padding = function(padding) {
     var vm = this;
     vm._config._padding = padding;
     return vm;
   }
 
-  Treemap.prototype.nestBy = function(keys) {
+  Treemap.nestBy = function(keys) {
     var vm = this;
     if (Array.isArray(keys)) {
       if (keys.length == 0)
@@ -65,52 +73,44 @@ export default function(config) {
     return vm;
   }
 
-  Treemap.prototype.format = function(format) {
+  Treemap.format = function(format) {
     var vm = this;
     if (typeof format == 'function' || format instanceof Function)
-      vm._config._format = format;
+      vm.utils.format = format;
     else
-      vm._config._format = d3.format(format);
+      vm.utils.format = d3.format(format, vm._config.decimals);
     return vm;
   }
 
-  Treemap.prototype.labels = function(bool) {
+  Treemap.labels = function(bool) {
     var vm = this;
     vm._config._labels = Boolean(bool);
     return vm;
   };
 
-  Treemap.prototype.tip = function(tip) {
+  Treemap.tip = function(tip) {
     var vm = this;
     vm._config.tip = tip;
     vm._tip.html(vm._config.tip);
     return vm;
   }
 
-  //-------------------------------
-  //Triggered by the chart.js;
-  Treemap.prototype.chart = function(chart) {
-    var vm = this;
-    vm._chart = chart;
-    return vm;
-  }
-
-  Treemap.prototype.scales = function() {
+  Treemap.scales = function (scales) {
     var vm = this;
     return vm;
   }
 
-  Treemap.prototype.axes = function() {
+  Treemap.axes = function() {
     var vm = this;
     return vm;
   }
 
-  Treemap.prototype.domains = function() {
+  Treemap.domains = function() {
     var vm = this;
     return vm;
   }
 
-  Treemap.prototype.isValidStructure = function(datum) {
+  Treemap.isValidStructure = function(datum) {
     var vm = this;
     if ((typeof datum.name === 'string' || datum.name instanceof String) && Array.isArray(datum.children)) {
       var res = true;
@@ -125,7 +125,7 @@ export default function(config) {
     }
   }
 
-  Treemap.prototype.formatNestedData = function(data) {
+  Treemap.formatNestedData = function(data) {
     var vm = this;
     if (data.key) {
       data.name = data.key;
@@ -155,7 +155,7 @@ export default function(config) {
     }))
   }
 
-  Treemap.prototype.data = function(data) {
+  Treemap.data = function(data) {
     var vm = this;
     // Validate structure like [{name: '', children: [{},{}]}]
     if (data) {
@@ -206,13 +206,13 @@ export default function(config) {
     return vm;
   }
 
-  Treemap.prototype.draw = function() {
+  Treemap.draw = function() {
     var vm = this;
-    vm._chart._svg.call(vm._tip);
+    vm.chart.svg().call(vm._tip);
 
     var treemap = d3.treemap()
       .tile(d3.treemapResquarify)
-      .size([vm._chart._width, vm._chart._height])
+      .size([vm.chart.width, vm.chart.height])
       .round(true)
       .paddingInner(vm._config._padding);
 
@@ -229,7 +229,7 @@ export default function(config) {
 
     treemap(root);
 
-    var cell = vm._chart._svg.selectAll("g")
+    var cell = vm.chart.svg().selectAll("g")
       .data(root.leaves())
       .enter().append("g")
       .attr("transform", function(d) {
@@ -247,7 +247,7 @@ export default function(config) {
         return d.y1 - d.y0;
       })
       .attr("fill", function(d) {
-        return vm._config._colorScale(d.data.id);
+        return vm._scales.color(d.data.name);
       });
 
     cell.append("clipPath")
@@ -280,7 +280,7 @@ export default function(config) {
         .attr("x", 8)
         .attr("y", 45)
         .text(function(d) {
-          return d.value > 2 ? vm._config._format(d.value) : '';
+          return d.value > 2 ? vm.utils.format(null, true)(d.value) : '';
         });
     }
 
@@ -299,5 +299,7 @@ export default function(config) {
 
     return vm;
   }
-  return new Treemap(config);
+
+  Treemap.init(config);
+  return Treemap;
 }
