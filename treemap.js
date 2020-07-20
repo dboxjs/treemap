@@ -3,22 +3,22 @@ import * as d3 from 'd3';
 /* 
  * Simple SVG Treemap Chart
  */
-export default function(config, helper) {
+export default function (config, helper) {
 
   var Treemap = Object.create(helper);
 
-  Treemap.init = function(config) {
+  Treemap.init = function (config) {
     var vm = this;
     vm._config = config ? config : {};
     vm._config._padding = 3;
     vm._config._labels = false;
-    vm._config.tip = function(d) {
+    vm._config.tip = function (d) {
       var html = '<div>';
       if (d.parent.data.name && d.parent.data.name !== 'data') {
 
-        html += '<span>' + d.parent.data.name + '</span><br>'; 
+        html += '<span>' + d.parent.data.name + '</span><br>';
       }
-      html += '<span>' + d.data.name + '</span><br>'; 
+      html += '<span>' + d.data.name + '</span><br>';
       html += '<span>' + vm.utils.format()(d.value) + '</span>';
       html += '</div>';
       return html;
@@ -34,13 +34,13 @@ export default function(config, helper) {
       .html(vm._config.tip);
   }
 
-  Treemap.size = function(col) {
+  Treemap.size = function (col) {
     var vm = this;
     vm._config._size = col;
     return vm;
   }
 
-  Treemap.colors = function(arrayOfColors, domain) {
+  Treemap.colors = function (arrayOfColors, domain) {
     var vm = this;
     vm._scales.color = d3.scaleOrdinal(arrayOfColors);
     if (domain) {
@@ -49,22 +49,22 @@ export default function(config, helper) {
     return vm;
   }
 
-  Treemap.padding = function(padding) {
+  Treemap.padding = function (padding) {
     var vm = this;
     vm._config._padding = padding;
     return vm;
   }
 
-  Treemap.nestBy = function(keys) {
+  Treemap.nestBy = function (keys) {
     var vm = this;
     if (Array.isArray(keys)) {
-      if (keys.length == 0)
+      if (keys.length === 0)
         throw "Error: nestBy() array is empty";
       vm._config._keys = keys;
     } else if (typeof keys === 'string' || keys instanceof String) {
       vm._config._keys = [keys];
     } else {
-      if (keys == undefined || keys == null)
+      if (keys === undefined || keys === null)
         throw "Error: nestBy() expects column names to deaggregate data";
       vm._config._keys = [keys.toString()];
       console.warning("nestBy() expected name of columns. Argument will be forced to string version .toString()");
@@ -73,22 +73,22 @@ export default function(config, helper) {
     return vm;
   }
 
-  Treemap.format = function(format) {
+  Treemap.format = function (format) {
     var vm = this;
-    if (typeof format == 'function' || format instanceof Function)
+    if (typeof format === 'function' || format instanceof Function)
       vm.utils.format = format;
     else
       vm.utils.format = d3.format(format, vm._config.decimals);
     return vm;
   }
 
-  Treemap.labels = function(bool) {
+  Treemap.labels = function (bool) {
     var vm = this;
     vm._config._labels = Boolean(bool);
     return vm;
   };
 
-  Treemap.tip = function(tip) {
+  Treemap.tip = function (tip) {
     var vm = this;
     vm._config.tip = tip;
     vm._tip.html(vm._config.tip);
@@ -100,32 +100,32 @@ export default function(config, helper) {
     return vm;
   }
 
-  Treemap.axes = function() {
+  Treemap.axes = function () {
     var vm = this;
     return vm;
   }
 
-  Treemap.domains = function() {
+  Treemap.domains = function () {
     var vm = this;
     return vm;
   }
 
-  Treemap.isValidStructure = function(datum) {
+  Treemap.isValidStructure = function (datum) {
     var vm = this;
     if ((typeof datum.name === 'string' || datum.name instanceof String) && Array.isArray(datum.children)) {
       var res = true;
-      datum.children.forEach(function(child) {
+      datum.children.forEach(function (child) {
         res = res && vm.isValidStructure(child);
       });
       return res;
-    } else if ((typeof datum.name === 'string' || datum.name instanceof String) && Number(datum[vm._config._size]) == datum[vm._config._size]) {
+    } else if ((typeof datum.name === 'string' || datum.name instanceof String) && Number(datum[vm._config._size]) === datum[vm._config._size]) {
       return true;
     } else {
       return false;
     }
   }
 
-  Treemap.formatNestedData = function(data) {
+  Treemap.formatNestedData = function (data) {
     var vm = this;
     if (data.key) {
       data.name = data.key;
@@ -137,7 +137,7 @@ export default function(config, helper) {
     }
     if (Array.isArray(data.values)) {
       var children = [];
-      data.values.forEach(function(v) {
+      data.values.forEach(function (v) {
         children.push(vm.formatNestedData(v))
       });
       data.children = children;
@@ -150,18 +150,18 @@ export default function(config, helper) {
   }
 
   function nestKey(nest, key, callback) {
-    callback(null, nest.key(function(d) {
+    callback(null, nest.key(function (d) {
       return d[key];
     }))
   }
 
-  Treemap.data = function(data) {
+  Treemap.data = function (data) {
     var vm = this;
     // Validate structure like [{name: '', children: [{},{}]}]
     if (data) {
       if (Array.isArray(data) && data.length > 0) {
         if (!vm.isValidStructure(data[0])) {
-          data.forEach(function(d) {
+          data.forEach(function (d) {
             d[vm._config._size] = +d[vm._config._size];
           });
           try {
@@ -171,9 +171,9 @@ export default function(config, helper) {
             var queue = d3.queue();
             for (var i = 0; i < vm._config._keys.length; i++)
               queue.defer(nestKey, nested, vm._config._keys[i])
-            queue.awaitAll(function(error, nested) {
-              var nestedData = nested[0].rollup(function(leaves) {
-                return d3.sum(leaves, function(d) {
+            queue.awaitAll(function (error, nested) {
+              var nestedData = nested[0].rollup(function (leaves) {
+                return d3.sum(leaves, function (d) {
                   return d[vm._config._size];
                 })
               }).entries(data);
@@ -206,7 +206,7 @@ export default function(config, helper) {
     return vm;
   }
 
-  Treemap.draw = function() {
+  Treemap.draw = function () {
     var vm = this;
     vm.chart.svg().call(vm._tip);
 
@@ -217,13 +217,13 @@ export default function(config, helper) {
       .paddingInner(vm._config._padding);
 
     var root = d3.hierarchy(vm._data)
-      .eachBefore(function(d) {
+      .eachBefore(function (d) {
         d.data.id = (d.parent ? d.parent.data.id + "." : "") + d.data.name;
       })
-      .sum(function(d) {
+      .sum(function (d) {
         return d[vm._config._size];
       })
-      .sort(function(a, b) {
+      .sort(function (a, b) {
         return b.height - a.height || b.value - a.value;
       });
 
@@ -232,43 +232,43 @@ export default function(config, helper) {
     var cell = vm.chart.svg().selectAll("g")
       .data(root.leaves())
       .enter().append("g")
-      .attr("transform", function(d) {
+      .attr("transform", function (d) {
         return "translate(" + d.x0 + "," + d.y0 + ")";
       });
 
     var rect = cell.append("rect")
-      .attr("id", function(d) {
+      .attr("id", function (d) {
         return d.data.id;
       })
-      .attr("width", function(d) {
+      .attr("width", function (d) {
         return d.x1 - d.x0;
       })
-      .attr("height", function(d) {
+      .attr("height", function (d) {
         return d.y1 - d.y0;
       })
-      .attr("fill", function(d) {
+      .attr("fill", function (d) {
         return vm._scales.color(d.data.name);
       });
 
     cell.append("clipPath")
-      .attr("id", function(d) {
+      .attr("id", function (d) {
         return "clip-" + d.data.id;
       })
       .append("use")
-      .attr("xlink:href", function(d) {
+      .attr("xlink:href", function (d) {
         return "#" + d.data.id;
       });
 
     if (vm._config._labels) {
       var text = cell.append("text")
-        .attr("clip-path", function(d) {
+        .attr("clip-path", function (d) {
           return "url(#clip-" + d.data.id + ")";
         })
       text.append("tspan")
         .attr('class', 'capitalize')
         .attr("x", 8)
         .attr("y", 25)
-        .text(function(d) {
+        .text(function (d) {
           if (d.value > 2) {
             var arr = d.data.id.replace('data.', '').split('.');
             return arr.length > 1 ? arr.slice(arr.length - 2, arr.length).join(' / ') : arr[arr.length - 1].toString();
@@ -279,18 +279,18 @@ export default function(config, helper) {
         .attr('class', 'capitalize')
         .attr("x", 8)
         .attr("y", 45)
-        .text(function(d) {
+        .text(function (d) {
           return d.value > 2 ? vm.utils.format(null, true)(d.value) : '';
         });
     }
 
-    rect.on('mouseover', function(d) {
+    rect.on('mouseover', function (d) {
         /*if(vm._config.data.mouseover){
           vm._config.data.mouseover.call(vm, d,i);
         }*/
         vm._tip.show(d, d3.select(this).node());
       })
-      .on('mouseout', function(d) {
+      .on('mouseout', function (d) {
         /*if(vm._config.data.mouseout){
           vm._config.data.mouseout.call(this, d,i);
         }*/
